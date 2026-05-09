@@ -1,0 +1,21 @@
+[project]
+name = "whisper-memo-backend"
+version = "0.1.0"
+description = "FastAPI backend for Whisper memo transcription MVP"
+requires-python = ">=3.11,<3.12"
+dependencies = [
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.30.0",
+    "sqlalchemy>=2.0.30",
+    "psycopg[binary]>=3.2.0",
+    "pydantic-settings>=2.4.0",
+    "python-multipart>=0.0.9",
+    "openai-whisper>=20250625",
+]
+
+[tool.ruff]
+line-length = 100
+
+[tool.pyright]
+pythonVersion = "3.11"
+typeCheckingMode = "basic"

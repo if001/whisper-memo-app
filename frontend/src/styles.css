@@ -1,0 +1,298 @@
+:root {
+  font-family:
+    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: #1f2937;
+  background: #f3f4f6;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+}
+
+button {
+  border: 0;
+  border-radius: 10px;
+  padding: 9px 12px;
+  cursor: pointer;
+  background: #e5e7eb;
+  color: #111827;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+input,
+textarea {
+  width: 100%;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  padding: 10px 12px;
+  background: #ffffff;
+  color: #111827;
+}
+
+textarea {
+  resize: vertical;
+  line-height: 1.7;
+}
+
+.appShell {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  height: 100vh;
+}
+
+.drawer {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px;
+  background: #111827;
+  color: #ffffff;
+  overflow-y: auto;
+}
+
+.drawerHeader h1 {
+  margin: 0;
+  font-size: 22px;
+}
+
+.drawerHeader p {
+  margin: 4px 0 0;
+  color: #9ca3af;
+  font-size: 13px;
+}
+
+.projectForm {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+}
+
+.projectForm input {
+  border: 1px solid #374151;
+  background: #1f2937;
+  color: #ffffff;
+}
+
+.projectForm button {
+  background: #ffffff;
+}
+
+.projectList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.project {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 6px;
+  align-items: center;
+  border-radius: 12px;
+  padding: 4px;
+}
+
+.project.active {
+  background: #374151;
+}
+
+.projectName {
+  overflow: hidden;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  background: transparent;
+  color: #ffffff;
+}
+
+.iconButton {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+}
+
+.mainPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  overflow-y: auto;
+  padding: 28px;
+}
+
+.mainHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.mainHeader h2 {
+  margin: 0;
+  font-size: 28px;
+}
+
+.eyebrow {
+  margin: 0 0 4px;
+  color: #6b7280;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.recorderPanel,
+.memoCard,
+.emptyState,
+.errorBox {
+  border: 1px solid #e5e7eb;
+  border-radius: 18px;
+  background: #ffffff;
+  box-shadow: 0 12px 30px rgb(15 23 42 / 0.06);
+}
+
+.recorderPanel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px;
+}
+
+.recorderPanel h2 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.recorderPanel p {
+  margin: 6px 0 0;
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.recorderActions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  white-space: nowrap;
+}
+
+.primary {
+  background: #2563eb;
+  color: #ffffff;
+}
+
+.stop,
+.danger {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.statusText,
+.recordingDot,
+.muted,
+.emptySmall {
+  color: #6b7280;
+  font-size: 13px;
+}
+
+.recordingDot {
+  color: #dc2626;
+  font-weight: 700;
+}
+
+.memoList {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.memoCard {
+  padding: 18px;
+}
+
+.memoCard header {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.memoCard h3 {
+  margin: 0;
+  font-size: 17px;
+}
+
+.memoCard header p {
+  margin: 4px 0 0;
+  color: #6b7280;
+  font-size: 13px;
+}
+
+.memoText {
+  margin: 0;
+  white-space: pre-wrap;
+  line-height: 1.8;
+}
+
+.cardActions {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.memoCard.editing {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.emptyState {
+  padding: 32px;
+  color: #6b7280;
+  text-align: center;
+}
+
+.errorBox {
+  padding: 12px 14px;
+  background: #fef2f2;
+  color: #991b1b;
+}
+
+@media (max-width: 780px) {
+  .appShell {
+    grid-template-columns: 1fr;
+    height: auto;
+    min-height: 100vh;
+  }
+
+  .drawer {
+    max-height: 320px;
+  }
+
+  .recorderPanel,
+  .mainHeader,
+  .memoCard header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}
