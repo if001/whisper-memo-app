@@ -5,8 +5,6 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:-app}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-app}
       POSTGRES_DB: ${POSTGRES_DB:-whisper_memo}
-    ports:
-      - "5434:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -23,11 +21,14 @@ services:
       WHISPER_DEVICE: ${WHISPER_DEVICE:-cpu}
       WHISPER_LANGUAGE: ${WHISPER_LANGUAGE:-ja}
       CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:5173,http://127.0.0.1:5173}
+      NVIDIA_VISIBLE_DEVICES: all
+      NVIDIA_DRIVER_CAPABILITIES: all
     ports:
       - "8001:8000"
     depends_on:
       db:
         condition: service_healthy
+    runtime: nvidia
 
   frontend:
     build: ./frontend
@@ -43,6 +44,16 @@ services:
       - ./frontend/vite.config.ts:/app/vite.config.ts
       - ./frontend/tsconfig.json:/app/tsconfig.json
       - ./frontend/tsconfig.node.json:/app/tsconfig.node.json
+
+  proxy:
+    image: nginx:1.27
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - frontend
+      - backend
 
 volumes:
   postgres_data:
