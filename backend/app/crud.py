@@ -67,6 +67,22 @@ def create_processing_transcription(
     return transcription
 
 
+def create_completed_transcription(
+    db: Session, project_id: int, title: str, text: str, language: str | None
+) -> models.Transcription:
+    transcription = models.Transcription(
+        project_id=project_id,
+        title=title,
+        text=text,
+        language=language,
+        status=models.TranscriptionStatus.COMPLETED,
+    )
+    db.add(transcription)
+    db.commit()
+    db.refresh(transcription)
+    return transcription
+
+
 def complete_transcription(
     db: Session, transcription: models.Transcription, text: str, language: str | None
 ) -> models.Transcription:
