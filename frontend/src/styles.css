@@ -146,6 +146,11 @@ textarea {
   gap: 16px;
 }
 
+.mainHeaderActions {
+  display: flex;
+  gap: 8px;
+}
+
 .mainHeader h2 {
   margin: 0;
   font-size: 28px;

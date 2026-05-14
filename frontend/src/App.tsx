@@ -13,6 +13,7 @@ export default function App() {
   const [loadingProjects, setLoadingProjects] = useState(true);
   const [loadingTranscriptions, setLoadingTranscriptions] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [summarizing, setSummarizing] = useState(false);
 
   const selectedProject = useMemo(
     () => projects.find((project) => project.id === selectedProjectId) ?? null,
@@ -99,6 +100,20 @@ export default function App() {
     setTranscriptions((current) => current.filter((transcription) => transcription.id !== id));
   }
 
+  async function summarizeTranscriptions() {
+    if (selectedProjectId === null) return;
+    setSummarizing(true);
+    setError(null);
+    try {
+      const summary = await api.summarizeTranscriptions(selectedProjectId);
+      setTranscriptions((current) => [summary, ...current]);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'まとめの生成に失敗しました。');
+    } finally {
+      setSummarizing(false);
+    }
+  }
+
   return (
     <div className="appShell">
       <ProjectDrawer
@@ -116,9 +131,14 @@ export default function App() {
             <p className="eyebrow">Project</p>
             <h2>{selectedProject ? selectedProject.name : 'プロジェクト未選択'}</h2>
           </div>
-          <button type="button" onClick={() => selectedProjectId && void loadTranscriptions(selectedProjectId)}>
-            再読み込み
-          </button>
+          <div className="mainHeaderActions">
+            <button type="button" onClick={() => void summarizeTranscriptions()} disabled={!selectedProjectId || summarizing}>
+              {summarizing ? '生成中...' : 'まとめを生成'}
+            </button>
+            <button type="button" onClick={() => selectedProjectId && void loadTranscriptions(selectedProjectId)}>
+              再読み込み
+            </button>
+          </div>
         </header>
 
         {error ? <div className="errorBox">{error}</div> : null}

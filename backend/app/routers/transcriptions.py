@@ -4,8 +4,9 @@ import tempfile
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status
 from sqlalchemy.orm import Session
 
-from app import crud, schemas
+from app import crud, models, schemas
 from app.db import get_db
+from app.ollama_service import ollama_service
 from app.whisper_service import whisper_service
 
 router = APIRouter(tags=["transcriptions"])
@@ -79,3 +80,42 @@ def delete_transcription(transcription_id: int, db: Session = Depends(get_db)) -
     if transcription is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Transcription not found")
     crud.delete_transcription(db, transcription)
+
+
+@router.post(
+    "/projects/{project_id}/transcriptions/summarize",
+    response_model=schemas.TranscriptionRead,
+    status_code=status.HTTP_201_CREATED,
+)
+def summarize_transcriptions(
+    project_id: int,
+    db: Session = Depends(get_db),
+) -> schemas.TranscriptionRead:
+    project = crud.get_project(db, project_id)
+    if project is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Project not found")
+
+    items = crud.list_transcriptions(db, project_id)
+    completed_texts = [
+        item.text
+        for item in items
+        if item.status == models.TranscriptionStatus.COMPLETED and item.text.strip()
+    ]
+    if not completed_texts:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="要約対象の完了済み文字起こしがありません。",
+        )
+
+    try:
+        result = ollama_service.summarize_notes(completed_texts)
+    except Exception as exc:  # noqa: BLE001 - return manageable error to UI.
+        raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail=str(exc)) from exc
+
+    return crud.create_completed_transcription(
+        db,
+        project_id=project_id,
+        title="技術ブログ向けまとめ",
+        text=result.text,
+        language="ja",
+    )
