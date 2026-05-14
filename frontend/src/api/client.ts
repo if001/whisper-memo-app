@@ -63,6 +63,10 @@ export const api = {
       body: form,
     });
   },
+  summarizeTranscriptions: (projectId: number) =>
+    request<Transcription>(`/projects/${projectId}/transcriptions/summarize`, {
+      method: "POST",
+    }),
   updateTranscription: (
     transcriptionId: number,
     payload: Pick<Transcription, "title" | "text">,
