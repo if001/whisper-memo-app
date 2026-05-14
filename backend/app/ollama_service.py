@@ -4,15 +4,15 @@ from urllib import error, request
 
 from app.config import get_settings
 
-SUMMARY_PROMPT = """あなたは文字起こしメモの編集者です。以下の条件に従って要約してください。
+SUMMARY_PROMPT = """ノートの一覧を以下の条件に従って整理しまとめてください。
 
-- 入力は音声の文字起こし文章である
-- 出力は技術ブログ記事のベースとして利用する
+- ノートは音声の文字起こし文章である
 - 口頭の言い回しや文字起こしノイズを整理して読みやすくする
+- 出力は技術ブログ記事のベースとして利用する
 - 重複内容は統合し、必要に応じて順序を整理する
 - 元データに存在しない内容は追加しない
 
-## 文字起こしメモ
+## ノートの一覧
 {notes}
 """
 
@@ -27,6 +27,7 @@ class OllamaService:
         settings = get_settings()
         self.base_url = settings.ollama_base_url.rstrip("/")
         self.model = settings.ollama_model
+        self.api_key = settings.ollama_api_key
 
     def summarize_notes(self, notes: list[str]) -> SummaryResult:
         notes_text = "\n\n---\n\n".join(note.strip() for note in notes if note.strip())
@@ -38,10 +39,14 @@ class OllamaService:
             "prompt": SUMMARY_PROMPT.format(notes=notes_text),
             "stream": False,
         }
+
         req = request.Request(
             url=f"{self.base_url}/api/generate",
             data=json.dumps(payload).encode("utf-8"),
-            headers={"Content-Type": "application/json"},
+            headers={
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + self.api_key,
+            },
             method="POST",
         )
 

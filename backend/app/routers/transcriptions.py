@@ -13,14 +13,17 @@ router = APIRouter(tags=["transcriptions"])
 
 
 @router.get(
-    "/projects/{project_id}/transcriptions", response_model=list[schemas.TranscriptionRead]
+    "/projects/{project_id}/transcriptions",
+    response_model=list[schemas.TranscriptionRead],
 )
 def list_transcriptions(
     project_id: int, db: Session = Depends(get_db)
 ) -> list[schemas.TranscriptionRead]:
     project = crud.get_project(db, project_id)
     if project is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Project not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Project not found"
+        )
     return crud.list_transcriptions(db, project_id)
 
 
@@ -38,12 +41,16 @@ async def create_transcription(
 ) -> schemas.TranscriptionRead:
     project = crud.get_project(db, project_id)
     if project is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Project not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Project not found"
+        )
 
     filename = file.filename or "audio.webm"
     suffix = Path(filename).suffix or ".webm"
     initial_title = title.strip() if title and title.strip() else "音声メモ 処理中"
-    transcription = crud.create_processing_transcription(db, project_id, initial_title, language)
+    transcription = crud.create_processing_transcription(
+        db, project_id, initial_title, language
+    )
 
     temp_path: str | None = None
     try:
@@ -53,7 +60,9 @@ async def create_transcription(
                 tmp.write(chunk)
 
         result = whisper_service.transcribe(temp_path, language=language)
-        return crud.complete_transcription(db, transcription, result.text, result.language)
+        return crud.complete_transcription(
+            db, transcription, result.text, result.language
+        )
     except Exception as exc:  # noqa: BLE001 - MVP records error in DB and returns it to UI.
         return crud.fail_transcription(db, transcription, str(exc))
     finally:
@@ -62,7 +71,9 @@ async def create_transcription(
             Path(temp_path).unlink(missing_ok=True)
 
 
-@router.patch("/transcriptions/{transcription_id}", response_model=schemas.TranscriptionRead)
+@router.patch(
+    "/transcriptions/{transcription_id}", response_model=schemas.TranscriptionRead
+)
 def update_transcription(
     transcription_id: int,
     payload: schemas.TranscriptionUpdate,
@@ -70,15 +81,21 @@ def update_transcription(
 ) -> schemas.TranscriptionRead:
     transcription = crud.get_transcription(db, transcription_id)
     if transcription is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Transcription not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Transcription not found"
+        )
     return crud.update_transcription(db, transcription, payload)
 
 
-@router.delete("/transcriptions/{transcription_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete(
+    "/transcriptions/{transcription_id}", status_code=status.HTTP_204_NO_CONTENT
+)
 def delete_transcription(transcription_id: int, db: Session = Depends(get_db)) -> None:
     transcription = crud.get_transcription(db, transcription_id)
     if transcription is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Transcription not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Transcription not found"
+        )
     crud.delete_transcription(db, transcription)
 
 
@@ -93,7 +110,9 @@ def summarize_transcriptions(
 ) -> schemas.TranscriptionRead:
     project = crud.get_project(db, project_id)
     if project is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Project not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Project not found"
+        )
 
     items = crud.list_transcriptions(db, project_id)
     completed_texts = [
@@ -110,7 +129,9 @@ def summarize_transcriptions(
     try:
         result = ollama_service.summarize_notes(completed_texts)
     except Exception as exc:  # noqa: BLE001 - return manageable error to UI.
-        raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail=str(exc)) from exc
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY, detail=str(exc)
+        ) from exc
 
     return crud.create_completed_transcription(
         db,
