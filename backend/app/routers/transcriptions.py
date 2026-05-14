@@ -136,7 +136,7 @@ def summarize_transcriptions(
     return crud.create_completed_transcription(
         db,
         project_id=project_id,
-        title="技術ブログ向けまとめ",
+        title="文字起こしまとめ",
         text=result.text,
         language="ja",
     )
